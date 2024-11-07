@@ -31,8 +31,8 @@ public class Player {
     private String nameGiven;
     private Integer weight;
     private Integer height;
-    private String bats;    // todo enum
-    private String throwsDirection; // todo
+    private String bats;
+    private String throwsDirection;
     private String debut;
     private String finalGame;
     private String retroId;

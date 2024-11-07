@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 @Component
 public class AppStarter implements InitializingBean {
@@ -29,6 +30,7 @@ public class AppStarter implements InitializingBean {
     }
 
     @Override
+    @Transactional
     public void afterPropertiesSet() throws Exception {
         String contentHash = DigestUtils.getFileMD5(csvPath);
 
