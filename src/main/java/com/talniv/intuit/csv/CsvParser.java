@@ -10,11 +10,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
+import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,7 +26,7 @@ public class CsvParser {
 
     public List<Player> parseCsv() throws IOException, CsvParsingException {
         final List<Player> players = new ArrayList<>();
-        try (BufferedReader fileReader = new BufferedReader(new InputStreamReader(new FileInputStream(csvPath), StandardCharsets.UTF_8))) {
+        try (FileReader fileReader = new FileReader(csvPath)) {
             CSVParser csvParser = new CSVParser(fileReader, CSVFormat.DEFAULT.withFirstRecordAsHeader().withTrim());
 
             Iterable<CSVRecord> csvRecords = csvParser.getRecords();
