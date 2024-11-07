@@ -1,4 +1,4 @@
-package com.talniv.intuit.service;
+package com.talniv.intuit.csv;
 
 import com.talniv.intuit.data.Player;
 import org.apache.commons.csv.CSVFormat;

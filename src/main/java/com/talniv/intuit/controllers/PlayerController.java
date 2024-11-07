@@ -2,13 +2,12 @@ package com.talniv.intuit.controllers;
 
 import com.talniv.intuit.data.Player;
 import com.talniv.intuit.service.PlayerService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.Optional;
 
 @Controller
@@ -22,8 +21,12 @@ public class PlayerController {
     }
 
     @GetMapping(path = "/players")
-    public @ResponseBody List<Player> getPlayers() {
-        return playerService.getAll();
+    public @ResponseBody Page<Player> getPlayers(@RequestParam(defaultValue = "0") int page,
+                                                 @RequestParam(defaultValue = "10") int size) {
+        // not ideal, as hibernate use offset-limit pagination. I found libraries implementing cursor-based pagination,
+        // but it's not a trivial integration
+        Pageable paging = PageRequest.of(page, size);
+        return playerService.getAll(paging);
     }
 
     @GetMapping(path = "/players/{id}")
