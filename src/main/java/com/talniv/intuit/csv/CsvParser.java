@@ -7,7 +7,6 @@ import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.FileReader;
@@ -40,26 +39,26 @@ public class CsvParser {
         return players;
     }
 
-    private static Player recordToPlayer(CSVRecord csvRecord) {
+    private Player recordToPlayer(CSVRecord csvRecord) {
         return new Player(
                 csvRecord.get("playerID"),
-                parseInt(csvRecord.get("birthYear")),
-                parseInt(csvRecord.get("birthMonth")),
-                parseInt(csvRecord.get("birthDay")),
+                getIntValue(csvRecord, "birthYear"),
+                getIntValue(csvRecord, "birthMonth"),
+                getIntValue(csvRecord, "birthDay"),
                 csvRecord.get("birthCountry"),
                 csvRecord.get("birthState"),
                 csvRecord.get("birthCity"),
-                parseInt(csvRecord.get("deathYear")),
-                parseInt(csvRecord.get("deathMonth")),
-                parseInt(csvRecord.get("deathDay")),
+                getIntValue(csvRecord, "deathYear"),
+                getIntValue(csvRecord, "deathMonth"),
+                getIntValue(csvRecord, "deathDay"),
                 csvRecord.get("deathCountry"),
                 csvRecord.get("deathState"),
                 csvRecord.get("deathCity"),
                 csvRecord.get("nameFirst"),
                 csvRecord.get("nameLast"),
                 csvRecord.get("nameGiven"),
-                parseInt(csvRecord.get("weight")),
-                parseInt(csvRecord.get("height")),
+                getIntValue(csvRecord, "weight"),
+                getIntValue(csvRecord, "height"),
                 csvRecord.get("bats"),
                 csvRecord.get("throws"),
                 csvRecord.get("debut"),
@@ -69,11 +68,18 @@ public class CsvParser {
         );
     }
 
-    private static Integer parseInt(String val) {
+    private Integer getIntValue(CSVRecord csvRecord, String col) {
+        String val = csvRecord.get(col);
         if (val.isBlank()) {
             return null;
         }
-        return Integer.parseInt(val);
+
+        try {
+            return Integer.parseInt(val);
+        } catch (NumberFormatException e) {
+            logger.error("Invalid value for column {} (expecting int)", col);
+            throw e;
+        }
     }
 
 }
