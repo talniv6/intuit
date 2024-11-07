@@ -20,11 +20,7 @@ public class CsvParser {
 
     private final Logger logger = LoggerFactory.getLogger(CsvParser.class);
 
-    @Value("${com.talniv.intuit.csvPath}")
-    private String csvPath;
-
-
-    public List<Player> parseCsv() throws IOException, CsvParsingException {
+    public List<Player> parseCsv(String csvPath) throws IOException, CsvParsingException {
         final List<Player> players = new ArrayList<>();
         try (FileReader fileReader = new FileReader(csvPath)) {
             CSVParser csvParser = new CSVParser(fileReader, CSVFormat.DEFAULT.withFirstRecordAsHeader().withTrim());
