@@ -9,7 +9,6 @@ import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,23 +25,25 @@ public class CsvLoader {
 
     private final PlayerRepository playerRepository;
 
-    @Value("${com.talniv.intuit.csvBatchSize}")
-    private int csvBatchSize;
-
     public CsvLoader(PlayerRepository playerRepository) {
         this.playerRepository = playerRepository;
     }
 
     @Transactional
-    public void loadCsv(String csvPath) throws IOException, CsvParsingException {
+    public void loadCsv(String csvPath, int csvBatchSize) throws IOException, CsvParsingException {
         // alternatively, can use native postgres csv load, but apparently it's not easy to match the header names in
         // the csv (which are camel case), to the column names hibernate generates (snake case).
+
+        if (csvBatchSize < 1) {
+            throw new CsvLoadException("batch size must be at least 1");
+        }
+
         logger.info("loading csv");
         try (FileReader fileReader = new FileReader(csvPath)) {
             CSVParser csvParser = CSVParser.parse(fileReader, CSVFormat.DEFAULT.withFirstRecordAsHeader().withTrim());
 
             int rowsCounter = 0;
-            final List<Player> playersBatch = new ArrayList<>();
+            List<Player> playersBatch = new ArrayList<>();
             for (CSVRecord csvRecord : csvParser) {
                 Player player;
                 try {
@@ -57,8 +58,13 @@ public class CsvLoader {
 
                 if (rowsCounter % csvBatchSize == 0) {
                     playerRepository.saveAll(playersBatch);
-                    playersBatch.clear();
+                    playersBatch = new ArrayList<>();
                 }
+            }
+
+            // last batch
+            if (!playersBatch.isEmpty()) {
+                playerRepository.saveAll(playersBatch);
             }
         }
         logger.info("done loading csv");
